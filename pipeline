@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out code from SCM"
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the project..."
+                // Example: for Java/Maven project
+                // sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                // Example: for Python
+                // sh 'pytest tests/'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                // Simulate deployment
+                // sh './deploy.sh'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully ✅"
+        }
+        failure {
+            echo "Pipeline failed ❌"
+        }
+    }
+}
