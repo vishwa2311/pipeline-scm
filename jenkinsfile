@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Git') {
+            steps {
+                // the pipeline itself is checked out by Jenkins from SCM,
+                // but this explicit git step double-checks/illustrates checkout
+                git branch: 'main', url: 'https://github.com/vishwa2311/pipeline-scm.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Build stage — run tests or compile here."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploy stage — do deployment steps here."
+            }
+        }
+    }
+
+    post {
+        success { echo "✅ Pipeline completed successfully!" }
+        failure { echo "❌ Pipeline failed!" }
+    }
+}
