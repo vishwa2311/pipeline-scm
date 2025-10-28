@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    options { timestamps() }
+
+    stages {
+        stage('Run') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        // For Linux or macOS agents
+                        sh '''
+                            echo "Running main step..."
+                            sleep 1
+                        '''
+                    } else {
+                        // For Windows agents
+                        bat '''
+                            @echo off
+                            echo Running main step...
+                            timeout /T 1 /NOBREAK
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build succeeded: ${env.BUILD_URL}"
+            // Example (optional): Send notification
+            // mail to: 'team@example.com',
+            //      subject: "Build succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            //      body: "Check the build details here: ${env.BUILD_URL}"
+        }
+        failure {
+            echo "❌ Build failed: ${env.BUILD_URL}"
+            // Example (optional): Slack or email notifications here
+        }
+    }
+}
