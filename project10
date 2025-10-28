@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENV', choices: ['staging', 'production'], description: 'Target environment')
+        booleanParam(name: 'ROLLBACK', defaultValue: false, description: 'Simulate rollback')
+    }
+
+    options { timestamps() }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        // Works on Linux/macOS agents
+                        sh '''
+                            echo "🚀 Deploying to $ENV ..."
+                            if [ "$ROLLBACK" = "true" ]; then
+                                echo "🔁 Rolling back to previous version..."
+                            else
+                                echo "⬆️ Deploying new version..."
+                            fi
+                            sleep 1
+                        '''
+                    } else {
+                        // Works on Windows agents
+                        bat """
+                            @echo off
+                            echo 🚀 Deploying to %ENV% ...
+                            if "%ROLLBACK%"=="true" (
+                                echo 🔁 Rolling back to previous version...
+                                powershell -NoProfile -Command "Start-Sleep -Seconds 1"
+                            ) else (
+                                echo ⬆️ Deploying new version...
+                                powershell -NoProfile -Command "Start-Sleep -Seconds 1"
+                            )
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            when {
+                expression { return params.ROLLBACK == false }
+            }
+            steps {
+                script {
+                    echo "🔍 Verifying deployment on environment: ${params.ENV}"
+                    sleep(time: 1, unit: 'SECONDS')
+                    echo "✅ Verification passed."
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "🏁 Pipeline finished. ENV=${params.ENV}, ROLLBACK=${params.ROLLBACK}"
+        }
+        success {
+            echo "🎉 SUCCESS: Deployment to ${params.ENV} completed."
+        }
+        failure {
+            echo "❌ FAILURE: Deployment failed or rollback executed."
+        }
+    }
+}
