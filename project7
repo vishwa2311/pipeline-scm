@@ -1,35 +1,52 @@
 pipeline {
     agent any
     options { timestamps() }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                bat '@echo off & echo Building... & mkdir -Force build || exit 0'
-            }
-        }
-        stage('Run Tests') {
-            steps {
-                // Simulate test output by creating a JUnit XML
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/vishwa2311/pipeline-scm.git',
+                        credentialsId: 'github-pat'
+                    ]],
+                    extensions: [[$class: 'CloneOption', depth: 1]]
+                ])
                 bat '''
-                @echo off
-                mkdir build || exit 0
-                cat > build\\TEST-demo.xml << EOF
-                <?xml version="1.0" encoding="UTF-8"?>
-                <testsuite tests="1" failures="0" name="demo">
-                  <testcase classname="demo.Test" name="testExample"/>
-                </testsuite>
-                EOF
-                echo Created fake JUnit XML
-                dir build
+                    echo Checkout done
+                    dir
                 '''
             }
         }
-        stage('Publish Results') {
-    steps {
-        echo "No tests to publish — skipping JUnit."
-    }
-}
 
+        stage('Build') {
+            steps {
+                bat 'echo Building...'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat '''
+                    echo Running tests...
+                    mkdir build\\test-results
+                    echo ^<testsuite name="DemoSuite" tests="1" failures="0"^>^<testcase classname="demo" name="sampleTest"/^>^</testsuite^> > build\\test-results\\demo-test.xml
+                '''
+            }
+        }
+
+        stage('Publish Results') {
+            steps {
+                junit 'build/test-results/*.xml'
+            }
+        }
     }
-    post { always { archiveArtifacts artifacts: 'build/**', onlyIfSuccessful: false } }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '**/build/test-results/*.xml', onlyIfSuccessful: true
+            echo "✅ Project7 done"
+        }
+    }
 }
