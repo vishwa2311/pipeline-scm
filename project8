@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+    options { timestamps() }
+
+    stages {
+        stage('Create Artifact') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        // For Linux/Mac agents
+                        sh '''
+                            echo "🔨 Creating output folder..."
+                            mkdir -p out
+                            echo "Sample file created on $(date)" > out/sample.txt
+                            echo "📦 Creating ZIP file..."
+                            zip -r out/sample.zip out/
+                            echo "✅ Listing output directory:"
+                            ls -l out
+                        '''
+                    } else {
+                        // For Windows agents
+                        bat '''
+                            @echo off
+                            echo 🔨 Creating output folder...
+                            if not exist out mkdir out
+                            echo Sample file created on %DATE% at %TIME% > out\\sample.txt
+                            
+                            echo 📦 Creating ZIP file...
+                            powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'out\\*' -DestinationPath 'out\\sample.zip' -Force"
+
+                            echo ✅ Listing output directory:
+                            dir out
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                echo "📂 Archiving artifact..."
+                archiveArtifacts artifacts: 'out/sample.zip', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Artifacts archived successfully!"
+        }
+        failure {
+            echo "❌ Build failed. Please check logs."
+        }
+    }
+}
