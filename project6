@@ -1,0 +1,21 @@
+pipeline {
+    agent { label 'win' }
+    options { timestamps() }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Use the Git step for fine-grained control
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/YOUR_USER/jenkins-pipeline-demo.git', credentialsId: 'github-pat']],
+                    extensions: [
+                        [$class: 'CloneOption', depth: 1, noTags: false, shallow: true, reference: '', timeout: 10],
+                        [$class: 'SubmoduleOption', disableSubmodules: false, recursiveSubmodules: true, trackingSubmodules: false]
+                    ]
+                ])
+                bat 'echo Checkout done & dir'
+            }
+        }
+    }
+    post { always { echo "Project6 done" } }
+}
