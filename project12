@@ -10,7 +10,8 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/YOUR_USER/jenkins-pipeline-demo.git'
+                        url: 'https://github.com/vishwa2311/pipeline-scm.git',
+                        credentialsId: 'github-pat'
                     ]]
                 ])
                 bat '@echo off & echo ✅ Main repo checked out & dir'
@@ -25,7 +26,8 @@ pipeline {
                         $class: 'GitSCM',
                         branches: [[name: '*/main']],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/YOUR_USER/some-shared-lib.git'
+                            url: 'https://github.com/vishwa2311/lib-demo.git',
+                            credentialsId: 'github-pat'
                         ]]
                     ])
                     bat '@echo off & echo ✅ Lib repo checked out & dir'
@@ -35,7 +37,7 @@ pipeline {
 
         stage('Combined Build') {
             steps {
-                bat '@echo off & echo 🏗️ Running combined build across repos... & powershell -Command "Start-Sleep -Seconds 1"'
+                bat '@echo off & echo 🏗️ Running combined build across repos... & powershell -Command "Start-Sleep -Seconds 2"'
             }
         }
     }
