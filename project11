@@ -1,0 +1,53 @@
+pipeline {
+    agent { label 'any' }
+
+    options { timestamps() }
+
+    stages {
+        stage('Parallel checks') {
+            parallel {
+                stage('Lint') {
+                    steps {
+                        script {
+                            if (isUnix()) {
+                                sh 'echo "Linting..." && sleep 1'
+                            } else {
+                                bat '@echo off & echo Linting... & powershell -NoProfile -Command "Start-Sleep -Seconds 1"'
+                            }
+                        }
+                    }
+                }
+
+                stage('Unit Tests') {
+                    steps {
+                        script {
+                            if (isUnix()) {
+                                sh 'echo "Running unit tests..." && sleep 1'
+                            } else {
+                                bat '@echo off & echo Running unit tests... & powershell -NoProfile -Command "Start-Sleep -Seconds 1"'
+                            }
+                        }
+                    }
+                }
+
+                stage('Security Scan') {
+                    steps {
+                        script {
+                            if (isUnix()) {
+                                sh 'echo "Running quick security scan..." && sleep 1'
+                            } else {
+                                bat '@echo off & echo Running quick security scan... & powershell -NoProfile -Command "Start-Sleep -Seconds 1"'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "✅ Parallel checks finished successfully"
+        }
+    }
+}
