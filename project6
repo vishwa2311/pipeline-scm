@@ -1,3 +1,7 @@
+#Project 6 — Git Checkout + Checkout Depth + Submodule example
+Purpose: show advanced checkout options (shallow clone, submodules).
+ Job name: pipeline-project6-git-checkout#
+
 pipeline {
     agent any
     options { timestamps() }
