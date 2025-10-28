@@ -10,7 +10,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/vishwa2311/pipeline-scm.git',
+                        url: 'https://github.com/vishwa2311/jenkins-pipeline-demo.git',
                         credentialsId: 'github-pat'
                     ]]
                 ])
@@ -26,7 +26,7 @@ pipeline {
                         $class: 'GitSCM',
                         branches: [[name: '*/main']],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/vishwa2311/lib-demo.git',
+                            url: 'https://github.com/vishwa2311/my-jenkins.git',
                             credentialsId: 'github-pat'
                         ]]
                     ])
