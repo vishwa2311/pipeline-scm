@@ -14,7 +14,7 @@ pipeline {
             steps {
                 bat '''
                     echo 🔨 Building the project...
-                    mkdir build
+                    if not exist build mkdir build
                     echo Build Complete > build\\output.txt
                 '''
             }
@@ -24,5 +24,31 @@ pipeline {
             steps {
                 bat '''
                     echo 🧪 Running simulated tests...
-                    mkdir build\\test-results
-                    echo ^<testsuite name="DemoSuite" tests="2
+                    if not exist build\\test-results mkdir build\\test-results
+                    echo ^<testsuite name="DemoSuite" tests="2" failures="0"^>^<testcase classname="demo" name="sampleTest1"/^>^<testcase classname="demo" name="sampleTest2"/^>^</testsuite^> > build\\test-results\\demo-test.xml
+                    echo ✅ Dummy test results created.
+                '''
+            }
+        }
+
+        stage('Publish Results') {
+            steps {
+                junit 'build/test-results/*.xml'
+                echo '📊 Published test results successfully.'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'build/**/*.*', fingerprint: true
+            echo '📦 Artifacts archived successfully.'
+        }
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Please check logs.'
+        }
+    }
+}
