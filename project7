@@ -1,0 +1,34 @@
+pipeline {
+    agent { label 'win' }
+    options { timestamps() }
+    stages {
+        stage('Build') {
+            steps {
+                bat '@echo off & echo Building... & mkdir -Force build || exit 0'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                // Simulate test output by creating a JUnit XML
+                bat '''
+                @echo off
+                mkdir build || exit 0
+                cat > build\\TEST-demo.xml << EOF
+                <?xml version="1.0" encoding="UTF-8"?>
+                <testsuite tests="1" failures="0" name="demo">
+                  <testcase classname="demo.Test" name="testExample"/>
+                </testsuite>
+                EOF
+                echo Created fake JUnit XML
+                dir build
+                '''
+            }
+        }
+        stage('Publish Results') {
+            steps {
+                junit 'build/TEST-*.xml'
+            }
+        }
+    }
+    post { always { archiveArtifacts artifacts: 'build/**', onlyIfSuccessful: false } }
+}
