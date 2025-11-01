@@ -1,4 +1,4 @@
-#pipeline {
+pipeline {
     agent any
     stages {
         stage('Checkout') {
@@ -11,7 +11,7 @@
                 echo "Building the code from GitHub..."
             }
         }
-        #stage('Test') {
+        stage('Test') {
             steps {
                 echo "Running tests..."
             }
