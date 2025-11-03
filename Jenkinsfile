@@ -1,4 +1,4 @@
-#pipeline {
+pipeline {
     agent any
     stages {
         stage('Checkout') {
@@ -6,7 +6,7 @@
                 checkout scm
             }
         }
-      # stage('Build') {
+      stage('Build') {
             steps {
                 echo "Building the code from GitHub..."
             }
