@@ -11,7 +11,7 @@ pipeline {
                 echo "Building the code from GitHub..."
             }
         }
-        #stage('Test') {
+        stage('Test') {
             steps {
                 echo "Running tests..."
             }
